@@ -1,0 +1,12 @@
+CREATE TABLE DiaryRecord (
+  id VARCHAR(255) PRIMARY KEY,
+  date VARCHAR(255) NOT NULL,
+  icon VARCHAR(255),
+  type VARCHAR(255),
+  name VARCHAR(255),
+  price DECIMAL(10, 2),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+  updated_by VARCHAR(255),
+    FOREIGN KEY (updated_by) REFERENCES MoneyUser(id)
+);
