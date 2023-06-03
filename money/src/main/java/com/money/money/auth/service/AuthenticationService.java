@@ -37,7 +37,6 @@ public class AuthenticationService {
   @Transactional
   public AuthenticationResponse register(RegisterRequest request) {
     var user = MoneyUser.builder()
-            .id(1L)
         .username(request.getUsername())
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))

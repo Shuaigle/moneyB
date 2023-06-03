@@ -1,9 +1,9 @@
 CREATE TABLE Token (
-  id INT PRIMARY KEY AUTO_INCREMENT,
+  id BIGSERIAL PRIMARY KEY,
   token VARCHAR(255) UNIQUE NOT NULL,
-  tokenType VARCHAR(50) NOT NULL,
+  token_type VARCHAR(50) NOT NULL,
   revoked BOOLEAN NOT NULL,
   expired BOOLEAN NOT NULL,
-  user_id VARCHAR(255),
+  user_id BIGINT,
   FOREIGN KEY (user_id) REFERENCES MoneyUser(id)
 );

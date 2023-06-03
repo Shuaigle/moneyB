@@ -26,6 +26,7 @@ import java.util.List;
 public class MoneyUser implements UserDetails {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String username;
