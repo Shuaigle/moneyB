@@ -1,4 +1,4 @@
-package com.money.money.domain;
+package com.money.money.auth.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRequest {
-    private String userName;
-    private String email;
-    private String password;
+public class AuthenticationRequest {
+
+  private String email;
+  String password;
 }

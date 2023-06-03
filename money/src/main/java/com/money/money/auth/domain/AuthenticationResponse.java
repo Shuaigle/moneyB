@@ -1,4 +1,4 @@
-package com.money.money.domain;
+package com.money.money.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterResponse {
-    @JsonProperty("id")
-    private String userId;
-    @JsonProperty("email")
-    private String email;
+public class AuthenticationResponse {
+
+  @JsonProperty("access_token")
+  private String accessToken;
+  @JsonProperty("refresh_token")
+  private String refreshToken;
 }
