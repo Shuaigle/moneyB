@@ -1,9 +1,9 @@
 package com.money.money.auth.controller;
 
-import com.money.money.auth.domain.AuthenticationRequest;
-import com.money.money.auth.domain.AuthenticationResponse;
+import com.money.money.auth.domain.AuthRequest;
+import com.money.money.auth.domain.AuthResponse;
 import com.money.money.auth.service.AuthenticationService;
-import com.money.money.auth.domain.RegisterRequest;
+import com.money.money.auth.domain.AuthRegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +24,14 @@ public class AuthenticationController {
   private final AuthenticationService service;
 
   @PostMapping("/register")
-  public ResponseEntity<AuthenticationResponse> register(
-      @RequestBody RegisterRequest request
+  public ResponseEntity<AuthResponse> register(
+      @RequestBody AuthRegisterRequest request
   ) {
     return ResponseEntity.ok(service.register(request));
   }
   @PostMapping("/authenticate")
-  public ResponseEntity<AuthenticationResponse> authenticate(
-      @RequestBody AuthenticationRequest request
+  public ResponseEntity<AuthResponse> authenticate(
+      @RequestBody AuthRequest request
   ) {
     return ResponseEntity.ok(service.authenticate(request));
   }
@@ -43,14 +43,5 @@ public class AuthenticationController {
   ) throws IOException {
     service.refreshToken(request, response);
   }
-
-  @GetMapping("/g")
-  public String g(
-          HttpServletRequest request,
-          HttpServletResponse response
-  ) {
-    return "h";
-  }
-
 
 }

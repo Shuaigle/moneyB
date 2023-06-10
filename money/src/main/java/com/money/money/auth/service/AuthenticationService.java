@@ -1,14 +1,16 @@
 package com.money.money.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.money.money.auth.domain.AuthenticationRequest;
-import com.money.money.auth.domain.AuthenticationResponse;
-import com.money.money.auth.domain.RegisterRequest;
+import com.money.money.auth.domain.AuthRequest;
+import com.money.money.auth.domain.AuthResponse;
+import com.money.money.auth.domain.AuthRegisterRequest;
 import com.money.money.domain.MoneyUser;
 import com.money.money.domain.Token;
 import com.money.money.domain.TokenType;
+import com.money.money.global.exception.MissingAuthHeaderException;
 import com.money.money.repository.MoneyUserRepository;
 import com.money.money.repository.TokenRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class AuthenticationService {
   private final AuthenticationManager authenticationManager;
 
   @Transactional
-  public AuthenticationResponse register(RegisterRequest request) {
+  public AuthResponse register(AuthRegisterRequest request) {
     var user = MoneyUser.builder()
         .username(request.getUsername())
         .email(request.getEmail())
@@ -41,26 +43,26 @@ public class AuthenticationService {
     var jwtToken = jwtService.generateToken(user);
     var refreshToken = jwtService.generateRefreshToken(user);
     saveUserToken(savedUser, jwtToken);
-    return AuthenticationResponse.builder()
+    return AuthResponse.builder()
             .accessToken(jwtToken)
             .refreshToken(refreshToken)
             .build();
   }
 
-  public AuthenticationResponse authenticate(AuthenticationRequest request) {
+  public AuthResponse authenticate(AuthRequest request) {
     authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(
-            request.getEmail(),
+            request.getUsername(),
             request.getPassword()
         )
     );
-    var user = repository.findByEmail(request.getEmail())
-        .orElseThrow();
+    var user = repository.findByUsername(request.getUsername())
+        .orElseThrow(() -> new EntityNotFoundException("User not found!"));
     var jwtToken = jwtService.generateToken(user);
     var refreshToken = jwtService.generateRefreshToken(user);
     revokeAllUserTokens(user);
     saveUserToken(user, jwtToken);
-    return AuthenticationResponse.builder()
+    return AuthResponse.builder()
         .accessToken(jwtToken)
             .refreshToken(refreshToken)
         .build();
@@ -94,20 +96,21 @@ public class AuthenticationService {
   ) throws IOException {
     final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
     final String refreshToken;
-    final String userEmail;
-    if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-      return;
+    final String userName;
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      throw new MissingAuthHeaderException("No Authorization header found or it does not start with 'Bearer '");
     }
+
     refreshToken = authHeader.substring(7);
-    userEmail = jwtService.extractUsername(refreshToken);
-    if (userEmail != null) {
-      var user = this.repository.findByEmail(userEmail)
-              .orElseThrow();
+    userName = jwtService.extractUsername(refreshToken);
+    if (userName != null) {
+      var user = this.repository.findByUsername(userName)
+              .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + userName));
       if (jwtService.isTokenValid(refreshToken, user)) {
         var accessToken = jwtService.generateToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, accessToken);
-        var authResponse = AuthenticationResponse.builder()
+        var authResponse = AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
