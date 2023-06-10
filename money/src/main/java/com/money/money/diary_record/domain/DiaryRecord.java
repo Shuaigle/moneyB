@@ -1,5 +1,6 @@
-package com.money.money.domain;
+package com.money.money.diary_record.domain;
 
+import com.money.money.domain.MoneyUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,11 +8,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -25,7 +28,7 @@ public class DiaryRecord {
     private Long id;
 
     @Column(nullable = false)
-    private String date;
+    private LocalDate date;
 
     @Column
     private String icon;
@@ -33,7 +36,7 @@ public class DiaryRecord {
     @Column
     private String type;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
     @Column
@@ -49,4 +52,9 @@ public class DiaryRecord {
     @JoinColumn(name = "updated_by")
     private MoneyUser updatedBy;
 
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
 }

@@ -1,4 +1,4 @@
-package com.money.money.conf;
+package com.money.money.auth.conf;
 
 import com.money.money.repository.MoneyUserRepository;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
-package com.money.money.repository;
+package com.money.money.diary_record.repository;
 
-import com.money.money.domain.DiaryRecord;
+import com.money.money.diary_record.domain.DiaryRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

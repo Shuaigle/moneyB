@@ -1,4 +1,4 @@
-package com.money.money.conf;
+package com.money.money.auth.conf;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
