@@ -35,7 +35,7 @@ public class ApplicationConfig {
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    var authProvider = new DaoAuthenticationProvider();
     authProvider.setUserDetailsService(userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder());
     return authProvider;
@@ -53,7 +53,7 @@ public class ApplicationConfig {
 
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
+    var configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(List.of("*"));
     configuration.addAllowedHeader("*");
     configuration.setAllowedMethods(Stream.of(HttpMethod.values())
