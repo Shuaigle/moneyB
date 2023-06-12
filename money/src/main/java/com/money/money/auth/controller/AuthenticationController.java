@@ -1,9 +1,8 @@
 package com.money.money.auth.controller;
 
-import com.money.money.auth.domain.AuthRequest;
+import com.money.money.auth.domain.AuthRegisterRequest;
 import com.money.money.auth.domain.AuthResponse;
 import com.money.money.auth.service.AuthenticationService;
-import com.money.money.auth.domain.AuthRegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +21,9 @@ public class AuthenticationController {
 
   private final AuthenticationService service;
 
-  @PostMapping("/register")
-  public ResponseEntity<AuthResponse> register(
-      @RequestBody AuthRegisterRequest request) {
-    return ResponseEntity.ok(service.register(request));
-  }
-  @PostMapping("/authenticate")
-  public ResponseEntity<AuthResponse> authenticate(
-      @RequestBody AuthRequest request) {
-    return ResponseEntity.ok(service.authenticate(request));
+  @PostMapping("/login")
+  public ResponseEntity<AuthResponse> login(@RequestBody AuthRegisterRequest request) {
+    return ResponseEntity.ok(service.login(request));
   }
 
   @PostMapping("/refresh-token")

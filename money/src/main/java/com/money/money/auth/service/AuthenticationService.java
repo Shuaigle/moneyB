@@ -1,7 +1,6 @@
 package com.money.money.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.money.money.auth.domain.AuthRequest;
 import com.money.money.auth.domain.AuthResponse;
 import com.money.money.auth.domain.AuthRegisterRequest;
 import com.money.money.domain.MoneyUser;
@@ -17,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,23 +49,32 @@ public class AuthenticationService {
             .build();
   }
 
-  public AuthResponse authenticate(AuthRequest request) {
-    authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            request.getUsername(),
-            request.getPassword()
-        )
+  @Transactional
+  public AuthResponse login(AuthRegisterRequest request) {
+    Authentication authentication = authenticateUserLogin(request);
+    if(authentication.isAuthenticated()) {
+      var user = repository.findByUsername(request.getUsername())
+              .orElseThrow(() -> new EntityNotFoundException("User not found!"));
+      var jwtToken = jwtService.generateToken(user);
+      var refreshToken = jwtService.generateRefreshToken(user);
+      revokeAllUserTokens(user);
+      saveUserToken(user, jwtToken);
+      return AuthResponse.builder()
+              .accessToken(jwtToken)
+              .refreshToken(refreshToken)
+              .build();
+    } else {
+      return this.register(request);
+    }
+  }
+
+  private Authentication authenticateUserLogin(AuthRegisterRequest request) {
+    return authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                    request.getUsername(),
+                    request.getPassword()
+            )
     );
-    var user = repository.findByUsername(request.getUsername())
-        .orElseThrow(() -> new EntityNotFoundException("User not found!"));
-    var jwtToken = jwtService.generateToken(user);
-    var refreshToken = jwtService.generateRefreshToken(user);
-    revokeAllUserTokens(user);
-    saveUserToken(user, jwtToken);
-    return AuthResponse.builder()
-        .accessToken(jwtToken)
-            .refreshToken(refreshToken)
-        .build();
   }
 
   private void saveUserToken(MoneyUser user, String jwtToken) {
