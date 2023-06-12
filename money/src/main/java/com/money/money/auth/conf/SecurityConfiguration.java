@@ -31,25 +31,20 @@ public class SecurityConfiguration {
     http
         .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
         .cors(cors -> cors.configurationSource(applicationConfig.corsConfigurationSource()))
-        .authorizeHttpRequests()
-        .requestMatchers(
-                "/auth/**"
-        )
-          .permitAll()
-
-        .anyRequest()
-          .authenticated()
-        .and()
-          .sessionManagement()
-          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
+            .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                    .requestMatchers("/auth/**").permitAll()
+                    .anyRequest().authenticated())
+            .sessionManagement(sessionManagement -> sessionManagement
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider)
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-        .logout()
-        .logoutUrl("/api/v1/auth/logout")
-        .addLogoutHandler(logoutHandler)
-        .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
-    ;
+        .logout(logout -> logout
+            .logoutUrl("/api/v1/auth/logout")
+            .addLogoutHandler(logoutHandler)
+            .logoutSuccessHandler((request, response, authentication) -> {
+              SecurityContextHolder.clearContext();
+              request.getSession(false).invalidate();
+            }));
 
     return http.build();
   }
