@@ -51,7 +51,7 @@ public class AuthenticationService {
 
   @Transactional
   public AuthResponse login(AuthRegisterRequest request) {
-    Authentication authentication = authenticateUserLogin(request);
+    var authentication = authenticateUserLogin(request);
     if(authentication.isAuthenticated()) {
       var user = repository.findByUsername(request.getUsername())
               .orElseThrow(() -> new EntityNotFoundException("User not found!"));
