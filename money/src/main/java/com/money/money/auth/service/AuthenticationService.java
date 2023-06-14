@@ -77,7 +77,7 @@ public class AuthenticationService {
     );
   }
 
-  private void saveUserToken(MoneyUser user, String jwtToken) {
+  public void saveUserToken(MoneyUser user, String jwtToken) {
     var token = Token.builder()
         .user(user)
         .token(jwtToken)
@@ -88,7 +88,7 @@ public class AuthenticationService {
     tokenRepository.save(token);
   }
 
-  private void revokeAllUserTokens(MoneyUser user) {
+  public void revokeAllUserTokens(MoneyUser user) {
     var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
     if (validUserTokens.isEmpty())
       return;
@@ -99,6 +99,7 @@ public class AuthenticationService {
     tokenRepository.saveAll(validUserTokens);
   }
 
+  @Transactional
   public void refreshToken(
           HttpServletRequest request,
           HttpServletResponse response
