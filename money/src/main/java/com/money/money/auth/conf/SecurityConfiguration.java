@@ -43,7 +43,6 @@ public class SecurityConfiguration {
             .addLogoutHandler(logoutHandler)
             .logoutSuccessHandler((request, response, authentication) -> {
               SecurityContextHolder.clearContext();
-              request.getSession(false).invalidate();
             }));
 
     return http.build();
