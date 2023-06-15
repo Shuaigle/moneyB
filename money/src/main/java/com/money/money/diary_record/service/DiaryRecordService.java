@@ -4,15 +4,28 @@ import com.money.money.diary_record.domain.DiaryRecord;
 import com.money.money.diary_record.repository.DiaryRecordRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class DiaryRecordService {
     private final DiaryRecordRepository repository;
+
+    public Page<DiaryRecord> getAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
+
+    public List<DiaryRecord> getByMonth(int year, int month) {
+        return repository.findByMonthAndYear(month, year);
+
+    }
 
     public DiaryRecord get(Long id) {
         return repository.findById(id).orElseThrow(
