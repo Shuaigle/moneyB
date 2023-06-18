@@ -34,3 +34,6 @@ build/
 
 ### idea ###
 .idea/
+
+### prod ###
+application-prod.properties
