@@ -1,4 +1,4 @@
-package com.money.money.auth.conf;
+package com.money.money.auth.conf.filter;
 
 import com.money.money.auth.service.JwtService;
 import com.money.money.repository.TokenRepository;
