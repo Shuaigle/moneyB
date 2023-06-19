@@ -13,16 +13,20 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -52,29 +56,35 @@ public class AuthenticationService {
   @Transactional
   public AuthResponse login(AuthRegisterRequest request) {
     var authentication = authenticateUserLogin(request);
-    if(authentication.isAuthenticated()) {
-      var user = repository.findByUsername(request.getUsername())
-              .orElseThrow(() -> new EntityNotFoundException("User not found!"));
-      var jwtToken = jwtService.generateToken(user);
-      var refreshToken = jwtService.generateRefreshToken(user);
-      revokeAllUserTokens(user);
-      saveUserToken(user, jwtToken);
-      return AuthResponse.builder()
-              .accessToken(jwtToken)
-              .refreshToken(refreshToken)
-              .build();
-    } else {
-      return this.register(request);
-    }
+    return authentication.filter(Authentication::isAuthenticated)
+            .map(auth -> repository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found!")))
+            .map(user -> {
+              var jwtToken = jwtService.generateToken(user);
+              var refreshToken = jwtService.generateRefreshToken(user);
+              revokeAllUserTokens(user);
+              saveUserToken(user, jwtToken);
+              return AuthResponse.builder()
+                      .accessToken(jwtToken)
+                      .refreshToken(refreshToken)
+                      .build();
+            })
+            .orElseGet(() -> this.register(request));
   }
 
-  private Authentication authenticateUserLogin(AuthRegisterRequest request) {
-    return authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                    request.getUsername(),
-                    request.getPassword()
-            )
-    );
+  private Optional<Authentication> authenticateUserLogin(AuthRegisterRequest request) {
+    try {
+      return Optional.of(authenticationManager.authenticate(
+              new UsernamePasswordAuthenticationToken(
+                      request.getUsername(),
+                      request.getPassword()
+              ))
+      );
+    } catch (AuthenticationException e) {
+      log.error("Authenticate user {} login error: {}, register the user.",
+              request.getUsername(), e.getMessage());
+      return Optional.empty();
+    }
   }
 
   public void saveUserToken(MoneyUser user, String jwtToken) {
