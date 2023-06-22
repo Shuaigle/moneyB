@@ -1,22 +1,27 @@
 package com.money.money.diary_record.service;
 
+import com.money.money.auth.service.AuthenticationService;
 import com.money.money.diary_record.domain.DiaryRecord;
 import com.money.money.diary_record.repository.DiaryRecordRepository;
+import com.money.money.domain.MoneyUser;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class DiaryRecordService {
     private final DiaryRecordRepository repository;
+    private final AuthenticationService authenticationService;
 
     public Page<DiaryRecord> getAll(Pageable pageable) {
         return repository.findAll(pageable);
@@ -34,6 +39,11 @@ public class DiaryRecordService {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public DiaryRecord create(DiaryRecord diaryRecord) {
+        Optional<UserDetails> user = authenticationService.getAuthenticationByContext();
+        if(user.isPresent()) {
+            MoneyUser moneyUser = (MoneyUser) user.get();
+            diaryRecord.setUpdatedBy(moneyUser);
+        }
         return repository.saveAndFlush(diaryRecord);
     }
 

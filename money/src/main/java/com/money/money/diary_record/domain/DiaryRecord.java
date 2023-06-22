@@ -1,5 +1,6 @@
 package com.money.money.diary_record.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.money.money.domain.MoneyUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,6 +49,7 @@ public class DiaryRecord {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "updated_by")
     private MoneyUser updatedBy;

@@ -36,7 +36,7 @@ public class DiaryRecordController {
             summary = "Get monthly diary records",
             description = "This operation will get the specific year and month diary records.")
     @GetMapping("/{year}/{month}")
-    ResponseEntity<List<DiaryRecord>> getByMonth(@PathVariable("year") int year,
+    public ResponseEntity<List<DiaryRecord>> getByMonth(@PathVariable("year") int year,
                                                  @PathVariable("month") int month) {
         return ResponseEntity.ok(service.getByMonth(month, year));
     }
