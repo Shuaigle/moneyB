@@ -1,6 +1,7 @@
 package com.money.money.diary_record.service;
 
 
+import com.money.money.auth.service.AuthenticationService;
 import com.money.money.diary_record.domain.DiaryRecord;
 import com.money.money.diary_record.repository.DiaryRecordRepository;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,9 @@ public class DiaryRecordServiceTest {
     @MockBean
     private DiaryRecordRepository repository;
 
+    @MockBean
+    private AuthenticationService authenticationService;
+
     private DiaryRecordService diaryRecordService;
 
     @Test
@@ -29,7 +33,7 @@ public class DiaryRecordServiceTest {
         expected.setName("Test Name");
         when(repository.findById(1L)).thenReturn(java.util.Optional.of(expected));
 
-        diaryRecordService = new DiaryRecordService(repository);
+        diaryRecordService = new DiaryRecordService(repository, authenticationService);
         DiaryRecord actual = diaryRecordService.get(1L);
         assertEquals(expected, actual);
     }
@@ -46,7 +50,7 @@ public class DiaryRecordServiceTest {
 
         when(repository.saveAndFlush(diaryRecord)).thenReturn(diaryRecord);
 
-        diaryRecordService = new DiaryRecordService(repository);
+        diaryRecordService = new DiaryRecordService(repository, authenticationService);
         DiaryRecord actual = diaryRecordService.create(diaryRecord);
         assertEquals(diaryRecord, actual);
     }
@@ -63,7 +67,7 @@ public class DiaryRecordServiceTest {
         when(repository.findById(1L)).thenReturn(java.util.Optional.of(existing));
         when(repository.saveAndFlush(existing)).thenReturn(newDiaryRecord);
 
-        diaryRecordService = new DiaryRecordService(repository);
+        diaryRecordService = new DiaryRecordService(repository, authenticationService);
         DiaryRecord actual = diaryRecordService.update(1L, newDiaryRecord);
         assertEquals(newDiaryRecord, actual);
     }
