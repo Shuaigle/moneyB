@@ -13,5 +13,5 @@
 
 ## api-docs
 
-http://localhost:8081/api/v1/swagger-ui/index.html#/
-http://localhost:8081/api/v1/v3/api-docs
+- http://localhost:8081/api/v1/swagger-ui/index.html#/
+- http://localhost:8081/api/v1/v3/api-docs
