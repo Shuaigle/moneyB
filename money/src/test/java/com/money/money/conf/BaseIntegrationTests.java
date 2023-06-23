@@ -8,11 +8,16 @@ import org.testcontainers.junit.jupiter.Container;
 public class BaseIntegrationTests {
 
     @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer =
-            new PostgreSQLContainer<>("postgres:latest")
+    private final static PostgreSQLContainer<?> postgreSQLContainer;
+
+    static {
+        try (PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:latest")) {
+            postgreSQLContainer = container
                     .withDatabaseName("money-integration-tests-db")
                     .withUsername("postgres")
                     .withPassword("password");
+        }
+    }
 
     @DynamicPropertySource
     static void setDatasourceProperties(DynamicPropertyRegistry registry) {
