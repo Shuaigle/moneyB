@@ -9,11 +9,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,8 +31,16 @@ public class DiaryRecordService {
     }
 
     public List<DiaryRecord> getByMonth(int year, int month) {
-        return repository.findByMonthAndYear(month, year);
-
+        Optional<UserDetails> userDetails = authenticationService.getAuthenticationByContext();
+        if (userDetails.isPresent()) {
+            LocalDate start = LocalDate.of(year, month, 1);
+            LocalDate end = LocalDate.of(year, month, 1).with(TemporalAdjusters.lastDayOfMonth());
+            return repository.findByUserIdAndDateRange(
+                    (MoneyUser) userDetails.get(), start, end);
+        }
+        throw new UsernameNotFoundException(
+                "Find diary records by month error: user is " +
+                        "not authenticated or not found in database");
     }
 
     public DiaryRecord get(Long id) {
@@ -40,7 +51,7 @@ public class DiaryRecordService {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public DiaryRecord create(DiaryRecord diaryRecord) {
         Optional<UserDetails> user = authenticationService.getAuthenticationByContext();
-        if(user.isPresent()) {
+        if (user.isPresent()) {
             MoneyUser moneyUser = (MoneyUser) user.get();
             diaryRecord.setUpdatedBy(moneyUser);
         }
