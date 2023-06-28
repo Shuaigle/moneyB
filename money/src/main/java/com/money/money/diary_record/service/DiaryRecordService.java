@@ -72,5 +72,10 @@ public class DiaryRecordService {
                 .orElseThrow(() -> new ResourceAccessException("DiaryRecord not found with id " + id));
     }
 
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    public void delete(Long id) {
+        repository.deleteById(id);
+    }
+
 
 }
