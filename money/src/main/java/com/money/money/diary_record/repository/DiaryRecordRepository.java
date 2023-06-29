@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface DiaryRecordRepository extends JpaRepository<DiaryRecord, Long> {
     @Query("SELECT dr FROM DiaryRecord dr WHERE dr.updatedBy = :updatedBy " +
-            "AND dr.date >= :startDate AND dr.date < :endDate")
+            "AND dr.date >= :startDate AND dr.date <= :endDate")
     List<DiaryRecord> findByUserIdAndDateRange(
             @Param("updatedBy") MoneyUser user,
             @Param("startDate") LocalDate startDate,
