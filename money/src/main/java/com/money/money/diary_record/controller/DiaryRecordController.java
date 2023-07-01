@@ -1,5 +1,6 @@
-package com.money.money.controller;
+package com.money.money.diary_record.controller;
 
+import com.money.money.diary_record.domain.DailyTotalCostProjection;
 import com.money.money.diary_record.domain.DiaryRecord;
 import com.money.money.diary_record.service.DiaryRecordService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,6 +75,17 @@ public class DiaryRecordController {
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         service.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(
+            summary = "Get daily diary records total cost",
+            description = "This operation will get the specific year and month diary records cost.")
+    @GetMapping("/daily/const/{year}/{month}")
+    public ResponseEntity<List<DailyTotalCostProjection>> dailyCalculateByYearAndMonth(
+            @PathVariable("year") int year,
+            @PathVariable("month") int month
+    ) {
+        return ResponseEntity.ok(service.getDailyTotalCostForUserAndDateRange(year, month));
     }
 
 }

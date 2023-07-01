@@ -1,15 +1,17 @@
 package com.money.money.diary_record.service;
 
 import com.money.money.auth.service.AuthenticationService;
+import com.money.money.diary_record.domain.DailyTotalCostProjection;
 import com.money.money.diary_record.domain.DiaryRecord;
 import com.money.money.diary_record.repository.DiaryRecordRepository;
 import com.money.money.domain.MoneyUser;
+import com.money.money.global.Range;
+import com.money.money.global.exception.UserNotAuthenticatedException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,19 +30,6 @@ public class DiaryRecordService {
 
     public Page<DiaryRecord> getAll(Pageable pageable) {
         return repository.findAll(pageable);
-    }
-
-    public List<DiaryRecord> getByMonth(int year, int month) {
-        Optional<UserDetails> userDetails = authenticationService.getAuthenticationByContext();
-        if (userDetails.isPresent()) {
-            LocalDate start = LocalDate.of(year, month, 1);
-            LocalDate end = LocalDate.of(year, month, 1).with(TemporalAdjusters.lastDayOfMonth());
-            return repository.findByUserIdAndDateRange(
-                    (MoneyUser) userDetails.get(), start, end);
-        }
-        throw new UsernameNotFoundException(
-                "Find diary records by month error: user is " +
-                        "not authenticated or not found in database");
     }
 
     public DiaryRecord get(Long id) {
@@ -75,6 +64,34 @@ public class DiaryRecordService {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    public Range<LocalDate> getStartAndEndDates(int year, int month) {
+        LocalDate start = LocalDate.of(year, month, 1);
+        LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
+        return new Range<>(start, end);
+    }
+
+    public MoneyUser getAuthenticatedUser() {
+        return authenticationService.getAuthenticationByContext()
+                .map(userDetails -> (MoneyUser) userDetails)
+                .orElseThrow(() -> new UserNotAuthenticatedException(
+                        "User is not authenticated or not found in database"));
+    }
+
+    public List<DailyTotalCostProjection> getDailyTotalCostForUserAndDateRange(
+            int year, int month
+    ) {
+        MoneyUser user = getAuthenticatedUser();
+        var range = getStartAndEndDates(year, month);
+        return repository.calculateDailyTotalCostForUserAndDateRange(user, range.start(),
+                range.end());
+    }
+
+    public List<DiaryRecord> getByMonth(int year, int month) {
+        var user = getAuthenticatedUser();
+        var range = getStartAndEndDates(year, month);
+        return repository.findByUserIdAndDateRange(user, range.start(), range.end());
     }
 
 

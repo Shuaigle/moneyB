@@ -1,6 +1,7 @@
 package com.money.money.global.handler;
 
 import com.money.money.global.exception.MissingAuthHeaderException;
+import com.money.money.global.exception.UserNotAuthenticatedException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,18 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseBody
-    public ResponseEntity<String> handleUsernameNotFoundException(UsernameNotFoundException e) {
+    public ResponseEntity<String> handleUsernameNotFoundException(
+            UsernameNotFoundException e
+    ) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(UserNotAuthenticatedException.class)
+    @ResponseBody
+    public ResponseEntity<String> handleUsernameNotFoundException(
+            UserNotAuthenticatedException e
+    ) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(MissingAuthHeaderException.class)
