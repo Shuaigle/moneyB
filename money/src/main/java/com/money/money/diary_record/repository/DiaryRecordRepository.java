@@ -22,7 +22,7 @@ public interface DiaryRecordRepository extends JpaRepository<DiaryRecord, Long> 
 
     @Query("SELECT dr.date as date, SUM(dr.price) as totalCost " +
             "FROM DiaryRecord dr " +
-            "WHERE dr.transactionType = dr.TransactionType.OUTCOME " +
+            "WHERE dr.transactionType = TransactionType.OUTCOME " +
             "AND dr.updatedBy = :updatedBy " +
             "AND dr.date >= :startDate AND dr.date <= :endDate " +
             "GROUP BY dr.date")

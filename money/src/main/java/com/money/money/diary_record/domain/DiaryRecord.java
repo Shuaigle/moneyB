@@ -66,8 +66,4 @@ public class DiaryRecord {
         updatedAt = LocalDateTime.now();
     }
 
-    public enum TransactionType {
-        INCOME, OUTCOME
-    }
-
 }
