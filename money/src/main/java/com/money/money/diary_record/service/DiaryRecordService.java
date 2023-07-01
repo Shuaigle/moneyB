@@ -82,7 +82,7 @@ public class DiaryRecordService {
     public List<DailyTotalCostProjection> getDailyTotalCostForUserAndDateRange(
             int year, int month
     ) {
-        MoneyUser user = getAuthenticatedUser();
+        var user = getAuthenticatedUser();
         var range = getStartAndEndDates(year, month);
         return repository.calculateDailyTotalCostForUserAndDateRange(user, range.start(),
                 range.end());
