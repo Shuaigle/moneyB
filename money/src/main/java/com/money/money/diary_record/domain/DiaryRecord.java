@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.money.money.domain.MoneyUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,6 +51,10 @@ public class DiaryRecord {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "transaction_type")
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "updated_by")
@@ -59,4 +65,9 @@ public class DiaryRecord {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
+
+    private enum TransactionType {
+        INCOME, OUTCOME
+    }
+
 }
