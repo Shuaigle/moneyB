@@ -80,7 +80,7 @@ public class DiaryRecordController {
     @Operation(
             summary = "Get daily diary records total cost",
             description = "This operation will get the specific year and month diary records cost.")
-    @GetMapping("/daily/const/{year}/{month}")
+    @GetMapping("/daily/cost/{year}/{month}")
     public ResponseEntity<List<DailyTotalCostProjection>> dailyCalculateByYearAndMonth(
             @PathVariable("year") int year,
             @PathVariable("month") int month
