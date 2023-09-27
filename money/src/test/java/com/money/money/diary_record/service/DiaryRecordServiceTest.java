@@ -7,7 +7,6 @@ import com.money.money.diary_record.domain.DiaryRecord;
 import com.money.money.diary_record.mock.MockDailyTotalCostProjection;
 import com.money.money.diary_record.repository.DiaryRecordRepository;
 import com.money.money.domain.MoneyUser;
-import com.money.money.global.Range;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Range;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -159,8 +159,8 @@ public class DiaryRecordServiceTest {
 
         Range<LocalDate> actual = diaryRecordService.getStartAndEndDates(year, month);
 
-        assertEquals(start, actual.start());
-        assertEquals(end, actual.end());
+        assertEquals(start, actual.getLowerBound().getValue().orElse(null));
+        assertEquals(end, actual.getUpperBound().getValue().orElse(null));
     }
 
     @Test
