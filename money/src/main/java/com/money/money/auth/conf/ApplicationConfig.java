@@ -24,13 +24,12 @@ import java.util.stream.Stream;
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-
     private final MoneyUserRepository repository;
 
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> repository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean
@@ -57,8 +56,8 @@ public class ApplicationConfig {
         configuration.setAllowedOrigins(List.of("*"));
         configuration.addAllowedHeader("*");
         configuration.setAllowedMethods(Stream.of(HttpMethod.values())
-                .map(HttpMethod::name)
-                .collect(Collectors.toList()));
+            .map(HttpMethod::name)
+            .collect(Collectors.toList()));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
