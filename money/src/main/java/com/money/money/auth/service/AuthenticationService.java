@@ -1,8 +1,8 @@
 package com.money.money.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.money.money.auth.domain.AuthResponse;
 import com.money.money.auth.domain.AuthRegisterRequest;
+import com.money.money.auth.domain.AuthResponse;
 import com.money.money.domain.MoneyUser;
 import com.money.money.domain.Token;
 import com.money.money.domain.TokenType;
@@ -41,50 +41,50 @@ public class AuthenticationService {
     @Transactional
     public AuthResponse register(AuthRegisterRequest request) {
         var user = MoneyUser.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .build();
+            .username(request.getUsername())
+            .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .build();
         var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
         return AuthResponse.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
+            .accessToken(jwtToken)
+            .refreshToken(refreshToken)
+            .build();
     }
 
     @Transactional
     public AuthResponse login(AuthRegisterRequest request) {
         var authentication = authenticateUserLogin(request);
         return authentication.filter(Authentication::isAuthenticated)
-                .map(auth -> repository.findByUsername(request.getUsername())
-                        .orElseThrow(() -> new EntityNotFoundException("User not found!")))
-                .map(user -> {
-                    var jwtToken = jwtService.generateToken(user);
-                    var refreshToken = jwtService.generateRefreshToken(user);
-                    revokeAllUserTokens(user);
-                    saveUserToken(user, jwtToken);
-                    return AuthResponse.builder()
-                            .accessToken(jwtToken)
-                            .refreshToken(refreshToken)
-                            .build();
-                })
-                .orElseGet(() -> this.register(request));
+            .map(auth -> repository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("User not found!")))
+            .map(user -> {
+                var jwtToken = jwtService.generateToken(user);
+                var refreshToken = jwtService.generateRefreshToken(user);
+                revokeAllUserTokens(user);
+                saveUserToken(user, jwtToken);
+                return AuthResponse.builder()
+                    .accessToken(jwtToken)
+                    .refreshToken(refreshToken)
+                    .build();
+            })
+            .orElseGet(() -> this.register(request));
     }
 
     private Optional<Authentication> authenticateUserLogin(AuthRegisterRequest request) {
         try {
             return Optional.of(authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword()
-                    ))
+                new UsernamePasswordAuthenticationToken(
+                    request.getUsername(),
+                    request.getPassword()
+                ))
             );
         } catch (AuthenticationException e) {
             log.error("Authenticate user {} login error: {}, register the user.",
-                    request.getUsername(), e.getMessage());
+                request.getUsername(), e.getMessage());
             return Optional.empty();
         }
     }
@@ -100,12 +100,12 @@ public class AuthenticationService {
 
     public void saveUserToken(MoneyUser user, String jwtToken) {
         var token = Token.builder()
-                .user(user)
-                .token(jwtToken)
-                .tokenType(TokenType.BEARER)
-                .expired(false)
-                .revoked(false)
-                .build();
+            .user(user)
+            .token(jwtToken)
+            .tokenType(TokenType.BEARER)
+            .expired(false)
+            .revoked(false)
+            .build();
         tokenRepository.save(token);
     }
 
@@ -121,10 +121,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String userName;
@@ -136,15 +133,15 @@ public class AuthenticationService {
         userName = jwtService.extractUsername(refreshToken);
         if (userName != null) {
             var user = this.repository.findByUsername(userName)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + userName));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + userName));
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
                 var authResponse = AuthResponse.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }

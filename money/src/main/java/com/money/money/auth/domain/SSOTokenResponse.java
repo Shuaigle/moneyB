@@ -5,20 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
+@RedisHash("SSOTokenResponse")
 @Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthRegisterRequest implements Serializable {
-
-    private String username;
-    private String email;
-    @ToString.Exclude
-    private String password;
-    @ToString.Exclude
-    private String token;
+public class SSOTokenResponse implements Serializable {
+    private UUID token;
 }
