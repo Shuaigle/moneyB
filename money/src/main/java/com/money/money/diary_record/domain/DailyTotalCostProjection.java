@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public interface DailyTotalCostProjection {
 
-    LocalDate getDate();
+    LocalDate date();
 
-    BigDecimal getTotalCost();
+    BigDecimal totalCost();
 }
