@@ -15,8 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -46,12 +47,17 @@ class AuthenticationServiceTest {
 
     @Test
     void registerUser() {
-        AuthRegisterRequest request = new AuthRegisterRequest("username", "password", "email");
+        AuthRegisterRequest request = new AuthRegisterRequest(
+            "username",
+            "password",
+            "email",
+            UUID.randomUUID().toString()
+        );
         MoneyUser user = MoneyUser.builder()
-                .username("username")
-                .password("password")
-                .email("email")
-                .build();
+            .username("username")
+            .password("password")
+            .email("email")
+            .build();
 
         when(passwordEncoder.encode(any())).thenReturn("encodedPassword");
         when(jwtService.generateToken(any())).thenReturn("token");
@@ -64,12 +70,17 @@ class AuthenticationServiceTest {
 
     @Test
     void loginUser() {
-        AuthRegisterRequest request = new AuthRegisterRequest("username", "password", "email");
+        AuthRegisterRequest request = new AuthRegisterRequest(
+            "username",
+            "password",
+            "email",
+            UUID.randomUUID().toString()
+        );
         MoneyUser user = MoneyUser.builder()
-                .username("username")
-                .password("password")
-                .email("email")
-                .build();
+            .username("username")
+            .password("password")
+            .email("email")
+            .build();
         Authentication auth = new UsernamePasswordAuthenticationToken("username", "password");
 
         when(authenticationManager.authenticate(any())).thenReturn(auth);

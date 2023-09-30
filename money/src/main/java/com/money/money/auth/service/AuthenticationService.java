@@ -126,7 +126,7 @@ public class AuthenticationService {
         final String refreshToken;
         final String userName;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new MissingAuthHeaderException("No Authorization header found or it does not start with 'Bearer '");
+            throw new MissingAuthHeaderException("No Authorization header found, or it does not start with 'Bearer '");
         }
 
         refreshToken = authHeader.substring(7);
