@@ -31,11 +31,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull FilterChain filterChain) throws ServletException, IOException {
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-        if (isAuthRequest(request)) {
+        if (hasAuthPathInRequest(request)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -60,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private boolean isAuthRequest(HttpServletRequest request) {
+    private boolean hasAuthPathInRequest(HttpServletRequest request) {
         return request.getServletPath().contains(AUTH_PATH);
     }
 
@@ -82,18 +82,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private boolean isTokenInRepositoryValid(String jwt) {
         return tokenRepository.findByToken(jwt)
-                .map(t -> !t.isExpired() && !t.isRevoked())
-                .orElse(false);
+            .map(t -> !t.isExpired() && !t.isRevoked())
+            .orElse(false);
     }
 
     private void setAuthentication(HttpServletRequest request, UserDetails userDetails) {
         var authToken = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities()
+            userDetails,
+            null,
+            userDetails.getAuthorities()
         );
         authToken.setDetails(
-                new WebAuthenticationDetailsSource().buildDetails(request)
+            new WebAuthenticationDetailsSource().buildDetails(request)
         );
         SecurityContextHolder.getContext().setAuthentication(authToken);
     }
