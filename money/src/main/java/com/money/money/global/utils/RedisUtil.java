@@ -7,12 +7,15 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @AllArgsConstructor
 public class RedisUtil {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    public static final Long TIME_IN_SECONDS = 30L;
+    public static final String SSO_KEY_SET = "SSO";
 
     // Example method to set a key-value pair in Redis
     public void set(String key, String value) {
@@ -42,6 +45,14 @@ public class RedisUtil {
     // Example method to add a member to a Redis set
     public Long addToSet(String key, Object value) {
         return redisTemplate.opsForSet().add(key, value);
+    }
+
+    public Long addToSetWithExpiration(String key, Object value, long timeout, TimeUnit timeUnit) {
+        var added = addToSet(key, value);
+        if (added != null && added > 0) {
+            redisTemplate.expire(key, timeout, timeUnit);
+        }
+        return added;
     }
 
     // Example method to retrieve all members of a Redis set
