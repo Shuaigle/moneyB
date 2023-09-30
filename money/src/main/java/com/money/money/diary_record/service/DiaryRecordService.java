@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Range;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ import org.springframework.web.client.ResourceAccessException;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -39,9 +37,9 @@ public class DiaryRecordService {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
     public DiaryRecord create(DiaryRecord diaryRecord) {
-        Optional<UserDetails> user = authenticationService.getAuthenticationByContext();
+        var user = authenticationService.getAuthenticationByContext();
         if (user.isPresent()) {
-            MoneyUser moneyUser = (MoneyUser) user.get();
+            var moneyUser = (MoneyUser) user.get();
             diaryRecord.setUpdatedBy(moneyUser);
         }
         return repository.saveAndFlush(diaryRecord);
@@ -67,8 +65,8 @@ public class DiaryRecordService {
     }
 
     public Range<LocalDate> getStartAndEndDates(int year, int month) {
-        LocalDate start = LocalDate.of(year, month, 1);
-        LocalDate end = start.with(TemporalAdjusters.lastDayOfMonth());
+        var start = LocalDate.of(year, month, 1);
+        var end = start.with(TemporalAdjusters.lastDayOfMonth());
         return Range.closed(start, end);
     }
 

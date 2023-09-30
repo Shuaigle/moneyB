@@ -90,7 +90,7 @@ public class AuthenticationService {
     }
 
     public Optional<UserDetails> getAuthenticationByContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             return Optional.of((UserDetails) authentication.getPrincipal());
@@ -122,7 +122,7 @@ public class AuthenticationService {
 
     @Transactional
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final var authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String userName;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

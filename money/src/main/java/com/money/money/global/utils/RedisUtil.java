@@ -70,8 +70,6 @@ public class RedisUtil {
         return (String) redisTemplate.opsForHash().get(key, field);
     }
 
-    // Add more fine-grained Redis operations as needed
-
     // Example method to delete a field from a Redis hash
     public void deleteFromHash(String key, String field) {
         redisTemplate.opsForHash().delete(key, field);

@@ -40,19 +40,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String jwt = extractJwtFromRequest(request);
+        var jwt = extractJwtFromRequest(request);
         if (jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String userName = jwtService.extractUsername(jwt);
+        var userName = jwtService.extractUsername(jwt);
         if (userName == null || isUserAlreadyAuthenticated()) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+        var userDetails = userDetailsService.loadUserByUsername(userName);
         if (isJwtAndUserValid(jwt, userDetails)) {
             setAuthentication(request, userDetails);
         }
@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String extractJwtFromRequest(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
+        var authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith(AUTH_HEADER_PREFIX)) {
             return authHeader.substring(AUTH_HEADER_PREFIX.length());
         }
